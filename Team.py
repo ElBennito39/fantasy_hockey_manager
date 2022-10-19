@@ -15,7 +15,7 @@ class Team:
     # self.details = http_get_team_details(ID)
 
     self.all.append(self)
-    print("Team " + str(self) + ' "' + self.name + '" Created')
+    print("Team " + str(self) + " " + self.name + " Created")
 
   ##print or return?
   def __str__(self):

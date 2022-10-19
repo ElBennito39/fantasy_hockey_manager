@@ -8,23 +8,33 @@ print("Welcome to the Fantasy Hockey Manager's Helper \n")
 
 teams = get_active_teams()
 
-print(Team.all)
+# print(Team.all)
 
 # select a team by name
-Team.select_team("New Jersey Devils")
+# my_team = Team.select_team("New Jersey Devils")
 print("\n")
 print("\n")
 
-print(Team.current_team) 
+# print(my_team.name)
 print("\n")
 print("\n")
-
 
 
 ###commented player information to reduce run-time while working on Teams
 # #get all players from API
 
-# players = get_active_players()
+players = get_active_players()
+
+#select a player by name
+# my_player = Player.select_player("Joonas Donskoi")
+
+# print(my_player.name)
+# print("\n")
+# print("\n")
+# print(my_player.data_from_player)
+# print("\n")
+# print("\n")
+# print(my_player.season_stats)
 
 # #print of Class variables example
 
