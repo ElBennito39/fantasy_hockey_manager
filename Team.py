@@ -26,8 +26,9 @@ class Team:
     all_teams = Team.all
     for team in all_teams:
       if team.data_from_teams['name'] == name:
-        Team.current_team = team
-        return team
+        Team.current_team = name
+        print(f"Selected: {name}, with ID: {team.data_from_teams['id']} ")
+        return team.data_from_teams 
         # can use team.data_from_teams, to produce team information
         # can use team.roster, to produce roster information
         # however, can't use just 'team'
