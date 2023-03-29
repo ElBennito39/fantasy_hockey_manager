@@ -1,4 +1,5 @@
 from API_serv import *
+import pandas as pd
 class Team:
   all = []
 
@@ -28,7 +29,9 @@ class Team:
       if team.data_from_teams['name'] == name:
         Team.current_team = name
         print(f"Selected: {name}, with ID: {team.data_from_teams['id']} ")
-        return team.data_from_teams 
+        # df = pd.json_normalize(team.roster)
+        # return df
+        return team
         # can use team.data_from_teams, to produce team information
         # can use team.roster, to produce roster information
         # however, can't use just 'team'

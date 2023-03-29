@@ -54,4 +54,4 @@ class Player:
     for player in all_players:
       if player.data_from_player[0]['fullName'] == name:
         Player.current_player = player
-        return player
+        return player.json()
