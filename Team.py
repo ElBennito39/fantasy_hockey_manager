@@ -7,7 +7,7 @@ class Team:
 
   def __init__(self,ID,data):
     self.ID = ID
-    self.data_from_teams = data
+    self.data = data
     self.name = data['name']
 
     # self.schedule = team_schedule(ID)
@@ -26,12 +26,9 @@ class Team:
   def select_team(cls, name):
     all_teams = Team.all
     for team in all_teams:
-      if team.data_from_teams['name'] == name:
+      if team.data['name'] == name:
         Team.current_team = name
-        print(f"Selected: {name}, with ID: {team.data_from_teams['id']} ")
+        print(f"Selected: {name}, with ID: {team.data['id']} ")
+        return team
         # df = pd.json_normalize(team.roster)
         # return df
-        return team
-        # can use team.data_from_teams, to produce team information
-        # can use team.roster, to produce roster information
-        # however, can't use just 'team'
