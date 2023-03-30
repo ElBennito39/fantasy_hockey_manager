@@ -38,7 +38,7 @@ def get_active_players():
             if i <1:
                 player_id = player['person']['id']  
                 Player(player_id,get_player(player_id))
-                i = i + 1
+                i += 1
                 # breakpoint()
             else:
                 pass
