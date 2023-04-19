@@ -10,7 +10,7 @@ class Player:
   def __init__(self,ID, data):
 
     self.ID = ID
-    self.data = data
+    self.details = data[0]
     self.name = data[0]['fullName']
 
     Player.player_count +=1
@@ -52,6 +52,6 @@ class Player:
   def select_player(cls, name):
     all_players = Player.all
     for player in all_players:
-      if player.data[0]['fullName'] == name:
-        Player.current_player = player
-        return player.json()
+      if player.details['fullName'] == name:
+        Player.current_player = name
+        return player
