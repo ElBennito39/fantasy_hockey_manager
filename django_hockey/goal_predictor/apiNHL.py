@@ -43,26 +43,24 @@ def populate_players():
 
 
 #create a function that fetches the names of all the teams for a season
-def fetch_teams(season):
-    #can change later to a season variable that is global and set by user
+def fetch_teams(season = get_current_season()):
+    #can change later to set by user
     url = BASE_URL+ENDPOINT_DICT['fetch_teams'].format(season)
     response = requests.get(url)
     data = response.json()
     return data["teams"]
 
 #create a function that calls the roster from the api for a Team instance
-def get_team_roster(id,season):
+def get_team_roster(id,season = get_current_season()):
     #will have to chagne at some point to take in the season expression
-    season = get_current_season()
     url = BASE_URL + ENDPOINT_DICT['team_roster'].format(id, season)
     response = requests.get(url)
     data = response.json()
     return data['teams'][0]['roster']['roster']
 
 #create a function that calls the team schedule from 
-def get_team_schedule(id, season):
+def get_team_schedule(id,season=get_current_season()):
     #will have to chagne at some point to take in the season expression
-    season = get_current_season()
     url = BASE_URL + ENDPOINT_DICT['team_schedule'].format(season, id)
     response = requests.get(url)
     data = response.json()
