@@ -1,5 +1,5 @@
 import requests
-from .models import get_current_season
+from .models import Team, get_current_season
 
 BASE_URL='https://statsapi.web.nhl.com/api/v1'
 
