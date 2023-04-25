@@ -1,5 +1,6 @@
 from django.db import models
-from .apiNHL import populate_teams, populate_players
+from django.core.management.base import CommandError, BaseCommand
+
 
 import datetime
 

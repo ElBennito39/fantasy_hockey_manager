@@ -1,2 +1,2 @@
 from django.core.management.base import CommandError, BaseCommand
-from goal_predictor.models import populate_teams
+from goal_predictor.apiNHL import populate_teams
