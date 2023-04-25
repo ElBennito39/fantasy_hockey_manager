@@ -1,4 +1,6 @@
 from django.db import models
+from .apiNHL import populate_teams, populate_players
+
 import datetime
 
 # Create your models here.
