@@ -93,7 +93,7 @@ def game_box(game_id):
 
 def game_live(game_id):
     api_response = http_get(ENDPOINT_DICT['game_live'].format(game_id))
-    return api_response
+    return api_response['liveData']['plays']
 
 
 ## Services for Team class
@@ -108,7 +108,7 @@ def fetch_teams():
 
 def team_schedule(team_id):
     api_response = http_get(ENDPOINT_DICT['team_schedule'].format(team_id, START_DATE, END_DATE))
-    return api_response['dates']
+    return api_response
 
 
 def team_roster(team_id):

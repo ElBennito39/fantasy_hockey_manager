@@ -3,17 +3,20 @@ from API_serv import *
 class Player:
   all = []
 
+  current_player =''
+
   player_count = 0
 
   def __init__(self,ID, data):
 
     self.ID = ID
-    self.data_from_player = data
+    self.details = data[0]
+    self.name = data[0]['fullName']
 
     Player.player_count +=1
 
     self.all.append(self)
-    print("Player " + str(self.ID) + f" - {self.data_from_player[0]['fullName']}" + " Created")
+    print("Player " + str(self) + " " + self.name + " Created")
 
 
     
@@ -43,4 +46,12 @@ class Player:
 
     
   def __str__(self):
-    return(self.ID)
+    return( str(self.ID) )
+
+  @classmethod
+  def select_player(cls, name):
+    all_players = Player.all
+    for player in all_players:
+      if player.details['fullName'] == name:
+        Player.current_player = name
+        return player
