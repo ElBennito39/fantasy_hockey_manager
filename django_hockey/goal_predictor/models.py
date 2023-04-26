@@ -20,6 +20,7 @@ def get_current_season():
 ## Create class Team where id, name are static and roster,schedule,stats,rankings change with season.
 class Team(models.Model):
     id = models.IntegerField(primary_key=True)
+    nhl_id = models.IntegerField(default=0)
     name = models.CharField(max_length=100)
     info = models.JSONField(default=dict)
     roster = models.JSONField(default=dict)
