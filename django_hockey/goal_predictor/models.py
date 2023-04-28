@@ -53,12 +53,12 @@ class Player(models.Model):
 
 ##Create classes for api stat calls, so that each produces an associated table to Player with foreign key
 
+#get player's log of games for a season
 class PlayerGameLog(models.Model):
     # id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-
     season = models.CharField(max_length=8)
-    time_on_ice = models.DurationField()
+    time_on_ice = models.IntegerField()
     assists = models.IntegerField()
     goals = models.IntegerField()
     pim = models.IntegerField()
@@ -67,16 +67,16 @@ class PlayerGameLog(models.Model):
     hits = models.IntegerField()
     power_play_goals = models.IntegerField()
     power_play_points = models.IntegerField()
-    power_play_time_on_ice = models.DurationField()
-    even_time_on_ice = models.DurationField()
+    power_play_time_on_ice = models.IntegerField()
+    even_time_on_ice = models.IntegerField()
     penalty_minutes = models.IntegerField()
-    faceoff_pct = models.FloatField()
-    shot_pct = models.FloatField()
+    faceoff_pct = models.FloatField(null=True)
+    shot_pct = models.FloatField(null=True)
     game_winning_goals = models.IntegerField()
     overtime_goals = models.IntegerField()
     shorthanded_goals = models.IntegerField()
     shorthanded_points = models.IntegerField()
-    shorthanded_time_on_ice = models.DurationField()
+    shorthanded_time_on_ice = models.IntegerField()
     blocked = models.IntegerField()
     plus_minus = models.IntegerField()
     points = models.IntegerField()
@@ -92,13 +92,41 @@ class PlayerGameLog(models.Model):
     is_win = models.BooleanField()
     is_ot = models.BooleanField()
 
-    # data = models.JSONField(default=dict)
+    def __str__(self):
+        return f'{self.player.name} - {self.team_name} vs. {self.opponent_name} on {self.date}'
 
-
+#get player stats for a given season
 class PlayerSeasonStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     season = models.CharField(max_length=8)
-    data = models.JSONField(default=dict)
+    games = models.IntegerField()
+    goals = models.IntegerField()
+    assists = models.IntegerField()
+    points = models.IntegerField()
+    plus_minus = models.IntegerField()
+    pim = models.IntegerField()
+    shots = models.IntegerField()
+    shot_pct = models.FloatField(null=True)
+    faceoff_pct = models.FloatField(null=True)
+    hits = models.IntegerField()
+    blocked = models.IntegerField()
+    time_on_ice = models.IntegerField()
+    power_play_goals = models.IntegerField()
+    power_play_points = models.IntegerField()
+    power_play_time_on_ice = models.IntegerField()
+    even_time_on_ice = models.IntegerField()
+    shifts = models.IntegerField()
+    time_on_ice_per_game = models.IntegerField()
+    even_time_on_ice_per_game = models.IntegerField()
+    short_handed_time_on_ice_per_game = models.IntegerField()
+    power_play_time_on_ice_per_game = models.IntegerField()
+    game_winning_goals = models.IntegerField()
+    overtime_goals = models.IntegerField()
+    short_handed_goals = models.IntegerField()
+    short_handed_points = models.IntegerField()
+    short_handed_time_on_ice = models.IntegerField()
+
+
 
 
 class PlayerDivSplits(models.Model):
