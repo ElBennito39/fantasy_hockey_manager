@@ -43,8 +43,6 @@ def populate_teams(season = get_current_season()):
                    season = season
                    )
        team_instances.append(team)
-    #    breakpoint()
-    #    team.save(commit=False)
     Team.objects.bulk_create(team_instances)
 
 #helper functions:
@@ -100,7 +98,7 @@ def populate_players(season=get_current_season()):
         for player_data in players:
             player_id = player_data['id']
             info = get_player_info(player_id)
-            breakpoint()
+            # breakpoint()
             player = Player(
                 #these we can get from player_data because they come from the team roster information we used to make player_data
                 nhl_id=player_id,
@@ -121,7 +119,7 @@ def fetch_team_players(team_id, season=None):
 
     Parameters:
     - team_id (int): the database id of the team
-    - season (str): the season to get data for (in YYYY-YYYY format)
+    - season (str): the season to get data for (in YYYYYYYY format)
     """
     url = BASE_URL + ENDPOINT_DICT['team_roster'].format(team_id, season)
     response = requests.get(url)
@@ -149,7 +147,10 @@ def get_player_info(player_id):
     url = BASE_URL + ENDPOINT_DICT['player_info'].format(player_id)
     response = requests.get(url)
     data = response.json()
-    return data
+    if data:
+        return data['people'][0]
+    else:
+        return {}
 
 
 ##function to populate PlayerGameLog stats tables from the NHL api
@@ -200,6 +201,7 @@ def populate_player_game_logs(season=get_current_season()):
             player_game_logs.append(player_game_log)
     PlayerGameLog.objects.bulk_create(player_game_logs)
 
+#helper functions:
 
 #create a function that calls the players game_log, season is defined when running parent function populate_players
 def get_player_game_log(player_id, season):
@@ -208,7 +210,7 @@ def get_player_game_log(player_id, season):
 
     Parameters:
     - player_id (int): the NHL ID for the player
-    - season (str): the season to get data for (in YYYY-YYYY format)
+    - season (str): the season to get data for (in YYYYYYYY format)
     """
     url = BASE_URL + ENDPOINT_DICT['player_game_log'].format(player_id, season)
     response = requests.get(url)
@@ -222,7 +224,7 @@ def get_player_game_log(player_id, season):
             
             # Extract fields from 'stat' dictionary
             stat_data = split['stat']
-            game_data['time_on_ice'] = str(datetime.datetime.strptime(stat_data.get('timeOnIce'), '%M:%S').time())  if stat_data.get('timeOnIce') else '00:00:00'
+            game_data['time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('timeOnIce').split(":"))) if stat_data.get('timeOnIce') else 0
             game_data['assists'] = stat_data.get('assists')
             game_data['goals'] = stat_data.get('goals')
             game_data['pim'] = stat_data.get('pim')
@@ -231,7 +233,7 @@ def get_player_game_log(player_id, season):
             game_data['hits'] = stat_data.get('hits')
             game_data['power_play_goals'] = stat_data.get('powerPlayGoals')
             game_data['power_play_points'] = stat_data.get('powerPlayPoints')
-            game_data['power_play_time_on_ice'] = str(datetime.datetime.strptime(stat_data.get('powerPlayTimeOnIce'), '%M:%S').time()) if stat_data.get('powerPlayTimeOnIce') else '00:00:00'
+            game_data['power_play_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('power_play_time_on_ice').split(":"))) if stat_data.get('power_play_time_on_ice') else 0
             game_data['penalty_minutes'] = stat_data.get('penaltyMinutes')
             game_data['faceoff_pct'] = stat_data.get('faceOffPct', None)
             game_data['shot_pct'] = stat_data.get('shotPct', None)
@@ -239,7 +241,7 @@ def get_player_game_log(player_id, season):
             game_data['overtime_goals'] = stat_data.get('overTimeGoals')
             game_data['shorthanded_goals'] = stat_data.get('shortHandedGoals')
             game_data['shorthanded_points'] = stat_data.get('shortHandedPoints')
-            game_data['shorthanded_time_on_ice'] = str(datetime.datetime.strptime(stat_data.get('shorthanded_time_on_ice'), '%M:%S').time()) if stat_data.get('shorthanded_time_on_ice') else '00:00:00'
+            game_data['shorthanded_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('shorthanded_time_on_ice').split(":"))) if stat_data.get('shorthanded_time_on_ice') else 0
             game_data['blocked'] = stat_data.get('blocked')
             game_data['plus_minus'] = stat_data.get('plusMinus')
             game_data['points'] = stat_data.get('points')
@@ -270,32 +272,79 @@ def get_player_game_log(player_id, season):
             breakpoint()
     return game_log_data
 
-    # if data['stats'][0]['splits']:  ##to pull the game splits as a dictionary
-    #     # Extract the stats data from the JSON response
-    #     game_data = data['stats'][0]
-    #     game_log = game_data['splits']
+  
+##function to populate PlayerSeasonStats tables from the NHL api
+def populate_player_season_stats(season=get_current_season()):
+    pass
 
-
-    
-
-#create a function that calls season stats from api and extracts the stats
+#create a function that calls single season stats from api and extracts the stats
 def get_player_season_stats(player_id, season):
     """
     Fetches player season stats for a given player ID and season from the NHL API.
 
     Parameters:
     - player_id (int): the NHL ID of the player
-    - season (str): the season to get data for (in YYYY-YYYY format)
+    - season (str): the season to get data for (in YYYYYYYY format)
     """
     url = BASE_URL + ENDPOINT_DICT['player_season_stats'].format(player_id, season)
     response = requests.get(url)
     data = response.json()
     season_stats = {}
     if data['stats']:
-        # Extract the stats data from the JSON response
-        stats_data = data['stats'][0]
-        season_stats = stats_data['splits'][0]['stat']
-    return season_stats
+        for stat in data['stats']:
+            if stat['type']['gameType']['description'] == 'Regular season':
+                season_stats['season'] = stat['splits'][0]['season']
+                for split in stat['splits']:
+                    stats = split['stat']
+                    season_stats['games'] = stats.get('games')
+                    season_stats['goals'] = stats.get('goals')
+                    season_stats['assists'] = stats.get('assists')
+                    season_stats['points'] = stats.get('points')
+                    season_stats['plus_minus'] = stats.get('plusMinus')
+                    season_stats['pim'] = stats.get('pim')
+                    season_stats['shots'] = stats.get('shots')
+                    season_stats['shot_pct'] = stats.get('shotPct')
+                    season_stats['faceoff_pct'] = stats.get('faceOffPct')
+                    season_stats['hits'] = stats.get('hits')
+                    season_stats['blocked'] = stats.get('blocked')
+                    season_stats['time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('timeOnIce').split(":"))) if 'timeOnIce' in stats else 0
+                    season_stats['power_play_goals'] = stats.get('powerPlayGoals')
+                    season_stats['power_play_points'] = stats.get('powerPlayPoints')
+                    season_stats['power_play_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('power_play_time_on_ice').split(":"))) if 'power_play_time_on_ice' in stats else 0
+                    season_stats['even_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('evenTimeOnIce').split(":"))) if 'evenTimeOnIce' in stats else 0
+                    season_stats['shifts'] = stats.get('shifts')
+                    season_stats['time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('time_on_ice_per_game').split(":"))) if 'time_on_ice_per_game' in stats else 0
+                    season_stats['even_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('even_time_on_ice_per_game').split(":"))) if 'even_time_on_ice_per_game' in stats else 0
+                    season_stats['short_handed_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('short_handed_time_on_ice_per_game').split(":"))) if 'short_handed_time_on_ice_per_game' in stats else 0
+                    season_stats['power_play_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('power_play_time_on_ice_per_game').split(":"))) if 'power_play_time_on_ice_per_game' in stats else 0
+                    season_stats['game_winning_goals'] = stats.get('gameWinningGoals')
+                    season_stats['overtime_goals'] = stats.get('overTimeGoals')
+                    season_stats['short_handed_goals'] = stats.get('shortHandedGoals')
+                    season_stats['short_handed_points'] = stats.get('shortHandedPoints')
+                    season_stats['short_handed_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('short_handed_time_on_ice').split(":"))) if 'short_handed_time_on_ice' in stats else 0
+        breakpoint()
+        return season_stats
+    else:
+        return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #create a function that calls division splits from api and extracts the stats
 def get_player_div_splits(player_id, season):
