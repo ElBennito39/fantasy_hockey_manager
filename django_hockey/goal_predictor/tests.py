@@ -1,4 +1,5 @@
 from django.test import TestCase
+from unittest.mock import patch
 
 # Create your tests here.
 from django.test import TestCase
@@ -7,6 +8,34 @@ from .models import get_current_season
 #auto generated tests for Models..
 from django.test import TestCase
 from .models import Team, Player, PlayerGameLog, PlayerSeasonStats
+from .apiNHL import *
+
+class PopulationFunctionTests(TestCase):
+    def test_populate_functions(self):
+        test_team_id = 5  # Replace this with the desired team's ID
+        test_player_id = 8471675  # Replace this with the desired player's NHL ID
+        test_season = get_current_season()
+
+        # Only populate the desired team
+        original_teams = fetch_teams(season=test_season)
+        filtered_teams = list(filter(lambda x: x['id'] == test_team_id, original_teams))
+        with patch('goal_predictor.apiNHL.fetch_teams', return_value=filtered_teams):
+            populate_teams()
+
+        # Only populate players for the desired team
+        original_players = fetch_team_players(test_team_id, season=test_season)
+        with patch('goal_predictor.apiNHL.fetch_team_players', return_value=original_players):
+            populate_players()
+
+        test_player = Player.objects.get(nhl_id=test_player_id)
+        populate_player_game_logs(test_player, test_season)
+        populate_player_season_stats(test_season)
+
+        # Check if the objects were created in the database
+        self.assertIsNotNone(Team.objects.get(nhl_id=test_team_id))
+        self.assertIsNotNone(test_player)
+        self.assertIsNotNone(PlayerGameLog.objects.filter(player=test_player))
+        self.assertIsNotNone(PlayerSeasonStats.objects.filter(player=test_player, season=test_season))
 
 
 class TeamTestCase(TestCase):
