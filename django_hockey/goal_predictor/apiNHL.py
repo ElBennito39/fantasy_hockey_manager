@@ -1,5 +1,6 @@
 import requests
 from .models import *
+from .utils import convert_mintime_to_seconds
 import datetime
 
 BASE_URL='https://statsapi.web.nhl.com/api/v1'
@@ -224,7 +225,8 @@ def get_player_game_log(player_id, season):
             
             # Extract fields from 'stat' dictionary
             stat_data = split['stat']
-            game_data['time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('timeOnIce').split(":"))) if stat_data.get('timeOnIce') else 0
+            game_data['time_on_ice'] = convert_mintime_to_seconds(stat_data.get('timeOnIce'))
+            # breakpoint()
             game_data['assists'] = stat_data.get('assists')
             game_data['goals'] = stat_data.get('goals')
             game_data['pim'] = stat_data.get('pim')
@@ -233,7 +235,8 @@ def get_player_game_log(player_id, season):
             game_data['hits'] = stat_data.get('hits')
             game_data['power_play_goals'] = stat_data.get('powerPlayGoals')
             game_data['power_play_points'] = stat_data.get('powerPlayPoints')
-            game_data['power_play_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('power_play_time_on_ice').split(":"))) if stat_data.get('power_play_time_on_ice') else 0
+            #check the below and other times, for the dictionary key call with .get(). the JSON has a camel not snake casing. see other attributes names
+            game_data['power_play_time_on_ice'] = convert_mintime_to_seconds(stat_data.get('power_play_time_on_ice')) 
             game_data['penalty_minutes'] = stat_data.get('penaltyMinutes')
             game_data['faceoff_pct'] = stat_data.get('faceOffPct', None)
             game_data['shot_pct'] = stat_data.get('shotPct', None)
@@ -241,7 +244,7 @@ def get_player_game_log(player_id, season):
             game_data['overtime_goals'] = stat_data.get('overTimeGoals')
             game_data['shorthanded_goals'] = stat_data.get('shortHandedGoals')
             game_data['shorthanded_points'] = stat_data.get('shortHandedPoints')
-            game_data['shorthanded_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stat_data.get('shorthanded_time_on_ice').split(":"))) if stat_data.get('shorthanded_time_on_ice') else 0
+            game_data['shorthanded_time_on_ice'] = convert_mintime_to_seconds(stat_data.get('shorthanded_time_on_ice')) 
             game_data['blocked'] = stat_data.get('blocked')
             game_data['plus_minus'] = stat_data.get('plusMinus')
             game_data['points'] = stat_data.get('points')
@@ -269,7 +272,7 @@ def get_player_game_log(player_id, season):
             game_data['is_ot'] = split['isOT']
             
             game_log_data.append(game_data)
-            breakpoint()
+            # breakpoint()
     return game_log_data
 
   
@@ -307,22 +310,22 @@ def get_player_season_stats(player_id, season):
                     season_stats['faceoff_pct'] = stats.get('faceOffPct')
                     season_stats['hits'] = stats.get('hits')
                     season_stats['blocked'] = stats.get('blocked')
-                    season_stats['time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('timeOnIce').split(":"))) if 'timeOnIce' in stats else 0
+                    season_stats['time_on_ice'] = convert_mintime_to_seconds(stats.get('timeOnIce'))
                     season_stats['power_play_goals'] = stats.get('powerPlayGoals')
                     season_stats['power_play_points'] = stats.get('powerPlayPoints')
-                    season_stats['power_play_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('power_play_time_on_ice').split(":"))) if 'power_play_time_on_ice' in stats else 0
-                    season_stats['even_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('evenTimeOnIce').split(":"))) if 'evenTimeOnIce' in stats else 0
+                    season_stats['power_play_time_on_ice'] = convert_mintime_to_seconds(stats.get('powerPlayTimeOnIce'))
+                    season_stats['even_time_on_ice'] = convert_mintime_to_seconds(stats.get('evenTimeOnIce'))
                     season_stats['shifts'] = stats.get('shifts')
-                    season_stats['time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('time_on_ice_per_game').split(":"))) if 'time_on_ice_per_game' in stats else 0
-                    season_stats['even_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('even_time_on_ice_per_game').split(":"))) if 'even_time_on_ice_per_game' in stats else 0
-                    season_stats['short_handed_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('short_handed_time_on_ice_per_game').split(":"))) if 'short_handed_time_on_ice_per_game' in stats else 0
-                    season_stats['power_play_time_on_ice_per_game'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('power_play_time_on_ice_per_game').split(":"))) if 'power_play_time_on_ice_per_game' in stats else 0
+                    season_stats['time_on_ice_per_game'] = convert_mintime_to_seconds(stats.get('timeOnIcePerGame'))
+                    season_stats['even_time_on_ice_per_game'] = convert_mintime_to_seconds(stats.get('evenTimeOnIcePerGame'))
+                    season_stats['short_handed_time_on_ice_per_game'] = convert_mintime_to_seconds(stats.get('shortHandedTimeOnIcePerGame'))
+                    season_stats['power_play_time_on_ice_per_game']   = convert_mintime_to_seconds(stats.get('powerPlayTimeOnIcePerGame'))
                     season_stats['game_winning_goals'] = stats.get('gameWinningGoals')
                     season_stats['overtime_goals'] = stats.get('overTimeGoals')
                     season_stats['short_handed_goals'] = stats.get('shortHandedGoals')
                     season_stats['short_handed_points'] = stats.get('shortHandedPoints')
-                    season_stats['short_handed_time_on_ice'] = sum(x * int(t) for x, t in zip([60, 1], stats.get('short_handed_time_on_ice').split(":"))) if 'short_handed_time_on_ice' in stats else 0
-        breakpoint()
+                    season_stats['short_handed_time_on_ice'] = convert_mintime_to_seconds(stats.get('shortHandedTimeOnIce'))
+        # breakpoint()
         return season_stats
     else:
         return None
