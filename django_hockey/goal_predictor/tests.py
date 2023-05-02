@@ -6,7 +6,7 @@ from .models import get_current_season
 
 #auto generated tests for Models..
 from django.test import TestCase
-from .models import Team, Player, PlayerGameLog
+from .models import Team, Player, PlayerGameLog, PlayerSeasonStats
 
 
 class TeamTestCase(TestCase):
@@ -155,6 +155,108 @@ class PlayerGameLogTestCase(TestCase):
             is_win=True,
             is_ot=False
         )
-
+    #test the string of our test data above.
     def test_game_log_str(self):
         self.assertEqual(str(self.game_log), 'Sidney Crosby - Pittsburgh Penguins vs. Test_Opponent on 2022-10-01')
+
+    #test relationship between 'Player' and 'PlayerGameLog'
+    def test_game_log_player(self):
+        self.assertEqual(self.game_log.player, self.player)
+    #test relationship between 'Team' and 'PlayerGameLog'
+    def test_game_log_team(self):
+        self.assertEqual(self.game_log.team_id, self.team.id)
+        self.assertEqual(self.game_log.team_name, self.team.name)
+
+
+class PlayerSeasonStatsTestCase(TestCase):
+    def setUp(self):
+        self.team = Team.objects.create(
+            id=1,
+            nhl_id=5,
+            name='Pittsburgh Penguins',
+            info={},
+            roster={},
+            schedule={},
+            stats={},
+            rankings={},
+            season=get_current_season(),
+        )
+        self.player = Player.objects.create(
+            id=1,
+            nhl_id=8471675,
+            name='Sidney Crosby',
+            position='C',
+            team=self.team,
+            info={}
+        )
+        self.stats = PlayerSeasonStats.objects.create(
+            player=self.player,
+            season='20222023',
+            games=0,
+            goals=0,
+            assists=0,
+            points=0,
+            plus_minus=0,
+            pim=0,
+            shots=0,
+            shot_pct=None,
+            faceoff_pct=None,
+            hits=0,
+            blocked=0,
+            time_on_ice=0,
+            power_play_goals=0,
+            power_play_points=0,
+            power_play_time_on_ice=0,
+            even_time_on_ice=0,
+            shifts=0,
+            time_on_ice_per_game=0,
+            even_time_on_ice_per_game=0,
+            short_handed_time_on_ice_per_game=0,
+            power_play_time_on_ice_per_game=0,
+            game_winning_goals=0,
+            overtime_goals=0,
+            short_handed_goals=0,
+            short_handed_points=0,
+            short_handed_time_on_ice=0
+        )
+
+    def test_player_season_stats_str(self):
+        expected_str = 'Sidney Crosby - 20222023 Season Stats'
+        self.assertEqual(str(self.stats), expected_str)
+
+    def test_player_season_stats_verbose_name_plural(self):
+        expected_verbose_name_plural = 'player season stats'
+        self.assertEqual(PlayerSeasonStats._meta.verbose_name_plural, expected_verbose_name_plural)
+
+    def test_player_season_stats_defaults(self):
+        defaults = {
+            'games': 0,
+            'goals': 0,
+            'assists': 0,
+            'points': 0,
+            'plus_minus': 0,
+            'pim': 0,
+            'shots': 0,
+            'shot_pct': None,
+            'faceoff_pct': None,
+            'hits': 0,
+            'blocked': 0,
+            'time_on_ice': 0,
+            'power_play_goals': 0,
+            'power_play_points': 0,
+            'power_play_time_on_ice': 0,
+            'even_time_on_ice': 0,
+            'shifts': 0,
+            'time_on_ice_per_game': 0,
+            'even_time_on_ice_per_game': 0,
+            'short_handed_time_on_ice_per_game': 0,
+            'power_play_time_on_ice_per_game': 0,
+            'game_winning_goals': 0,
+            'overtime_goals': 0,
+            'short_handed_goals': 0,
+            'short_handed_points': 0,
+            'short_handed_time_on_ice': 0
+        }
+        stats = PlayerSeasonStats.objects.create(player=self.player, season='20222023')
+        for key, value in defaults.items():
+            self.assertEqual(getattr(stats, key), value)
