@@ -114,7 +114,7 @@ def populate_players(season=get_current_season()):
 
 
 #create a function that gets all the palyers from a team. NOT COMPLETE.
-def fetch_team_players(team_id, season=None):
+def fetch_team_players(team_id, season=get_current_season()):
     """
     Fetches player data for a given team from the NHL API.
 
@@ -237,6 +237,7 @@ def get_player_game_log(player_id, season):
             game_data['power_play_points'] = stat_data.get('powerPlayPoints')
             #check the below and other times, for the dictionary key call with .get(). the JSON has a camel not snake casing. see other attributes names
             game_data['power_play_time_on_ice'] = convert_mintime_to_seconds(stat_data.get('power_play_time_on_ice')) 
+            game_data['even_time_on_ice'] = convert_mintime_to_seconds(stat_data.get('even_time_on_ice')) 
             game_data['penalty_minutes'] = stat_data.get('penaltyMinutes')
             game_data['faceoff_pct'] = stat_data.get('faceOffPct', None)
             game_data['shot_pct'] = stat_data.get('shotPct', None)
