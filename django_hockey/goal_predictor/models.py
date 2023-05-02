@@ -99,34 +99,40 @@ class PlayerGameLog(models.Model):
 class PlayerSeasonStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     season = models.CharField(max_length=8)
-    games = models.IntegerField()
-    goals = models.IntegerField()
-    assists = models.IntegerField()
-    points = models.IntegerField()
-    plus_minus = models.IntegerField()
-    pim = models.IntegerField()
-    shots = models.IntegerField()
+    games = models.IntegerField(default=0)
+    goals = models.IntegerField(default=0)
+    assists = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
+    plus_minus = models.IntegerField(default=0)
+    pim = models.IntegerField(default=0)
+    shots = models.IntegerField(default=0)
     shot_pct = models.FloatField(null=True)
     faceoff_pct = models.FloatField(null=True)
-    hits = models.IntegerField()
-    blocked = models.IntegerField()
-    time_on_ice = models.IntegerField()
-    power_play_goals = models.IntegerField()
-    power_play_points = models.IntegerField()
-    power_play_time_on_ice = models.IntegerField()
-    even_time_on_ice = models.IntegerField()
-    shifts = models.IntegerField()
-    time_on_ice_per_game = models.IntegerField()
-    even_time_on_ice_per_game = models.IntegerField()
-    short_handed_time_on_ice_per_game = models.IntegerField()
-    power_play_time_on_ice_per_game = models.IntegerField()
-    game_winning_goals = models.IntegerField()
-    overtime_goals = models.IntegerField()
-    short_handed_goals = models.IntegerField()
-    short_handed_points = models.IntegerField()
-    short_handed_time_on_ice = models.IntegerField()
+    hits = models.IntegerField(default=0)
+    blocked = models.IntegerField(default=0)
+    time_on_ice = models.IntegerField(default=0)
+    power_play_goals = models.IntegerField(default=0)
+    power_play_points = models.IntegerField(default=0)
+    power_play_time_on_ice = models.IntegerField(default=0)
+    even_time_on_ice = models.IntegerField(default=0)
+    shifts = models.IntegerField(default=0)
+    time_on_ice_per_game = models.IntegerField(default=0)
+    even_time_on_ice_per_game = models.IntegerField(default=0)
+    short_handed_time_on_ice_per_game = models.IntegerField(default=0)
+    power_play_time_on_ice_per_game = models.IntegerField(default=0)
+    game_winning_goals = models.IntegerField(default=0)
+    overtime_goals = models.IntegerField(default=0)
+    short_handed_goals = models.IntegerField(default=0)
+    short_handed_points = models.IntegerField(default=0)
+    short_handed_time_on_ice = models.IntegerField(default=0)
 
+    class Meta:
+        verbose_name_plural = 'player season stats'
 
+    def __str__(self):
+        return f'{self.player.name} - {self.season} Season Stats'
+
+    
 
 
 class PlayerDivSplits(models.Model):
