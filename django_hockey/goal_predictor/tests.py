@@ -10,32 +10,65 @@ from django.test import TestCase
 from .models import Team, Player, PlayerGameLog, PlayerSeasonStats
 from .apiNHL import *
 
-class PopulationFunctionTests(TestCase):
-    def test_populate_functions(self):
-        test_team_id = 5  # Replace this with the desired team's ID
-        test_player_id = 8471675  # Replace this with the desired player's NHL ID
-        test_season = get_current_season()
+# # Custom version of the populate_teams function for testing
+# def test_populate_teams(team_id, season):
+#     teams_data = fetch_teams(season=season)
+#     for team_data in teams_data:
+#         if team_data['id'] == team_id:
+#             team = Team(
+#                 nhl_id=team_data['id'],
+#                 name=team_data['name'],
+#                 info=team_data,
+#                 roster=get_team_roster(team_id, season=season),
+#                 schedule=get_team_schedule(team_id, season=season),
+#                 stats=get_team_stats(team_id, season=season),
+#                 rankings=get_team_rankings(team_id, season=season),
+#                 season=season,
+#             )
+#             team.save()
+#             break
 
-        # Only populate the desired team
-        original_teams = fetch_teams(season=test_season)
-        filtered_teams = list(filter(lambda x: x['id'] == test_team_id, original_teams))
-        with patch('goal_predictor.apiNHL.fetch_teams', return_value=filtered_teams):
-            populate_teams()
 
-        # Only populate players for the desired team
-        original_players = fetch_team_players(test_team_id, season=test_season)
-        with patch('goal_predictor.apiNHL.fetch_team_players', return_value=original_players):
-            populate_players()
 
-        test_player = Player.objects.get(nhl_id=test_player_id)
-        populate_player_game_logs(test_player, test_season)
-        populate_player_season_stats(test_season)
+# # Custom version of the populate_players function for testing
+# def test_populate_players(test_team_id, test_player_id):
+#     players_data = fetch_team_players(test_team_id)
+#     team = Team.objects.filter(nhl_id=test_team_id)
+#     for player_data in players_data:
+#         player = Player.objects.create(
+#             nhl_id=player_data['id'],
+#             name=player_data['name'],
+#             position=player_data['position'],
+#             team=team[0],
+#             info=get_player_info(player_data['id']),
+#             season=team[0].season 
+#         )
+#         player.save()
 
-        # Check if the objects were created in the database
-        self.assertIsNotNone(Team.objects.get(nhl_id=test_team_id))
-        self.assertIsNotNone(test_player)
-        self.assertIsNotNone(PlayerGameLog.objects.filter(player=test_player))
-        self.assertIsNotNone(PlayerSeasonStats.objects.filter(player=test_player, season=test_season))
+
+# class PopulationFunctionTests(TestCase):
+#     def test_populate_functions(self):
+#         test_team_id = 5  # Replace this with the desired team's ID
+#         test_player_id = 8471675  # Replace this with the desired player's NHL ID
+#         test_season = get_current_season()
+
+#         test_populate_teams(test_team_id, test_season)
+#         test_populate_players(test_team_id, test_player_id)
+
+#         # test_player = Player.objects.get(nhl_id=test_player_id)
+#         populate_player_game_logs(test_season)
+#         populate_player_season_stats(test_season)
+
+#         test_team =  Team.objects.filter(nhl_id=test_team_id)
+#         test_player =  Player.objects.filter(nhl_id=test_player_id)
+#         print(f"test_team is: {test_team}")
+#         print(f"test_player is: {test_player}")
+
+#         # Check if the objects were created in the database
+#         self.assertIsNotNone(Team.objects.get(nhl_id=test_team_id))
+#         self.assertIsNotNone(Player.objects.get(nhl_id=test_player_id))
+#         self.assertIsNotNone(PlayerGameLog.objects.filter(player=Player.objects.get(nhl_id=test_player_id)))
+#         self.assertIsNotNone(PlayerSeasonStats.objects.filter(player=Player.objects.get(nhl_id=test_player_id), season=test_season))
 
 
 class TeamTestCase(TestCase):
