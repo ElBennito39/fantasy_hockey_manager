@@ -278,7 +278,46 @@ def get_player_game_log(player_id, season):
   
 ##function to populate PlayerSeasonStats tables from the NHL api
 def populate_player_season_stats(season=get_current_season()):
-    pass
+    players = Player.objects.all()
+    player_season_stats_list = []
+    for player in players:
+        player_id = player.nhl_id
+        season_stats_data = get_player_season_stats(player_id, season)
+        if season_stats_data:
+            player_season_stats = PlayerSeasonStats(
+                player=player,
+                season=season_stats_data['season'],
+                games=season_stats_data['games'],
+                goals=season_stats_data['goals'],
+                assists=season_stats_data['assists'],
+                points=season_stats_data['points'],
+                plus_minus=season_stats_data['plus_minus'],
+                pim=season_stats_data['pim'],
+                shots=season_stats_data['shots'],
+                shot_pct=season_stats_data['shot_pct'],
+                faceoff_pct=season_stats_data['faceoff_pct'],
+                hits=season_stats_data['hits'],
+                blocked=season_stats_data['blocked'],
+                time_on_ice=season_stats_data['time_on_ice'],
+                power_play_goals=season_stats_data['power_play_goals'],
+                power_play_points=season_stats_data['power_play_points'],
+                power_play_time_on_ice=season_stats_data['power_play_time_on_ice'],
+                even_time_on_ice=season_stats_data['even_time_on_ice'],
+                shifts=season_stats_data['shifts'],
+                time_on_ice_per_game=season_stats_data['time_on_ice_per_game'],
+                even_time_on_ice_per_game=season_stats_data['even_time_on_ice_per_game'],
+                short_handed_time_on_ice_per_game=season_stats_data['short_handed_time_on_ice_per_game'],
+                power_play_time_on_ice_per_game=season_stats_data['power_play_time_on_ice_per_game'],
+                game_winning_goals=season_stats_data['game_winning_goals'],
+                overtime_goals=season_stats_data['overtime_goals'],
+                short_handed_goals=season_stats_data['short_handed_goals'],
+                short_handed_points=season_stats_data['short_handed_points'],
+                short_handed_time_on_ice=season_stats_data['short_handed_time_on_ice']
+            )
+            player_season_stats_list.append(player_season_stats)
+    PlayerSeasonStats.objects.bulk_create(player_season_stats_list)
+
+
 
 #create a function that calls single season stats from api and extracts the stats
 def get_player_season_stats(player_id, season):
