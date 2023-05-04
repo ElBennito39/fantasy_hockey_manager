@@ -92,13 +92,18 @@ def get_team_rankings(team_id,season=get_current_season()):
 ##function to populate Players from the NHL api.
 def populate_players(season=get_current_season()):
     teams = Team.objects.all()
+    # print('Looping through teams...')
     for team in teams:
+        # print(f'Looking at team: {team}')
         #fetch all the player from 'teams'
-        players = fetch_team_players(team.id, season=season)
+        players = fetch_team_players(team.nhl_id, season=season)
         player_instances = []
+        
         for player_data in players:
+            # print(f'Looking at player data: {player_data}')
             player_id = player_data['id']
             info = get_player_info(player_id)
+            # print(f'player info: {info}')
             # breakpoint()
             player = Player(
                 #these we can get from player_data because they come from the team roster information we used to make player_data
@@ -123,9 +128,11 @@ def fetch_team_players(team_id, season=get_current_season()):
     - season (str): the season to get data for (in YYYYYYYY format)
     """
     url = BASE_URL + ENDPOINT_DICT['team_roster'].format(team_id, season)
+    # print(f'fetch teams url: {url}')
     response = requests.get(url)
     data = response.json()
     players = []
+    # print(f'fetch teams data: {data}')
     for player_data in data['teams'][0]['roster']['roster']:
         player = {
             'id': player_data['person']['id'],
@@ -281,10 +288,13 @@ def get_player_game_log(player_id, season):
 def populate_player_season_stats(season=get_current_season()):
     players = Player.objects.all()
     player_season_stats_list = []
+    # print('Looping through players...')
     for player in players:
+        # print(f'Looking at player: {player}')
         player_id = player.nhl_id
         season_stats_data = get_player_season_stats(player_id, season)
         if season_stats_data:
+            # print(f'Looking at {player} season {season} stats: {season_stats_data}')
             player_season_stats = PlayerSeasonStats(
                 player=player,
                 season=season_stats_data['season'],
